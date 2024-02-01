@@ -19,7 +19,9 @@ class clickableTurtle:
     def show(self):
         t.fillcolor(self.color)
 
-        #t.goto(random.randint(0+self.size, width-))
+        t.penup()
+        t.goto(random.randint(0+self.size, t.window_height()-self.size), t.window_height()/2)
+        t.pendown()
         t.shapesize(self.size, self.size, 1)
 
         t.begin_fill()
