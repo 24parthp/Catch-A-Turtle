@@ -1,42 +1,54 @@
 #importing libraries
 import turtle as t
-import random
+from random import randint
 
 #screen
 wn = t.Screen()
 t.setup(1000,500)
+t.bgcolor('#151740')
+t.ht()
 
 #variables and functions
-clickedTurtle = False
+startTimer = False
 
 class clickableTurtle:
     def __init__(self, shape, color, size, speed):
-        self.shape = str(shape)
-        self.color = str(color)
+        self.shape = shape
+        self.color = color
         self.size = size
         self.speed = speed
+        self.trtl = t.Turtle()
+        global startTimer
 
     def show(self):
-        t.fillcolor(self.color)
+        self.trtl.fillcolor(self.color)
 
-        t.penup()
-        t.goto(random.randint(0+self.size, t.window_height()-self.size), t.window_height()/2)
-        t.pendown()
-        t.shapesize(self.size, self.size, 1)
+        self.trtl.penup()
+        self.trtl.goto(0, 0)
+        self.trtl.pendown()
+        self.trtl.shapesize(self.size, self.size, 1)
 
-        t.begin_fill()
-        t.shape(self.shape)
-        t.end_fill()
+        self.trtl.begin_fill()
+        self.trtl.shape(self.shape)
+        self.trtl.end_fill()
 
-    # def move(self):
-    #     if clickedTurtle == True:
+    def move(self, x, y):
+        startTimer = True
+
+        if startTimer == True:
+            xCor = round(randint((-wn.window_width()//2)+self.size*10, (wn.window_width()//2)-self.size*10))
+            yCor = round(randint((-wn.window_height()//2)+self.size*10, (wn.window_height()//2)-self.size*10))
+
+            self.trtl.penup()
+            self.trtl.goto(xCor, yCor)
+            self.trtl.pendown()
+            self.trtl.shapesize(self.size, self.size, 1)
 
 
 #initialize turtle
-mainTurtle = clickableTurtle('circle', 'blue', 10, None)
+mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
 
 mainTurtle.show()
-
-#mouse events
+mainTurtle.trtl.onclick(mainTurtle.move)
 
 wn.mainloop()
