@@ -1,6 +1,7 @@
 #importing libraries
 import turtle as t
 from random import randint
+import time
 
 #screen
 wn = t.Screen()
@@ -18,6 +19,7 @@ class clickableTurtle:
         self.size = size
         self.speed = speed
         self.trtl = t.Turtle()
+        self.trtl.speed(0)
         global startTimer
 
     def show(self):
@@ -44,11 +46,28 @@ class clickableTurtle:
             self.trtl.pendown()
             self.trtl.shapesize(self.size, self.size, 1)
 
+class countdown_timer:
+    def __init__(self, xPos, yPos, size, second):
+        self.xPos = xPos
+        self.yPos = yPos
+        self.size = size
+        self.seconds = second
+
+    def startTimer(self):
+        while self.seconds > 0:
+            print(f"Time remaining: {self.seconds} seconds")
+            time.sleep(1)
+            self.seconds -= 1
+
+        print("Time's up!")
 
 #initialize turtle
 mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
+timer = countdown_timer(None,None,None,5)
 
 mainTurtle.show()
 mainTurtle.trtl.onclick(mainTurtle.move)
+
+timer.startTimer()
 
 wn.mainloop()
