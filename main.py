@@ -2,6 +2,7 @@
 import turtle as t
 from random import randint
 import time
+import threading
 
 #screen
 wn = t.Screen()
@@ -11,6 +12,7 @@ t.ht()
 
 #variables and functions
 startTimer = False
+score = 0
 
 class clickableTurtle:
     def __init__(self, shape, color, size, speed):
@@ -20,7 +22,6 @@ class clickableTurtle:
         self.speed = speed
         self.trtl = t.Turtle()
         self.trtl.speed(0)
-        global startTimer
 
     def show(self):
         self.trtl.fillcolor(self.color)
@@ -35,7 +36,10 @@ class clickableTurtle:
         self.trtl.end_fill()
 
     def move(self, x, y):
+        global startTimer, score
+
         startTimer = True
+        score = score + 1
 
         if startTimer == True:
             xCor = round(randint((-wn.window_width()//2)+self.size*10, (wn.window_width()//2)-self.size*10))
@@ -65,9 +69,14 @@ class countdown_timer:
 mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
 timer = countdown_timer(None,None,None,5)
 
+#setting up turtle
 mainTurtle.show()
 mainTurtle.trtl.onclick(mainTurtle.move)
 
-timer.startTimer()
+#creating thread for timer
+timer_thread = threading.Thread(target=timer.startTimer)
+
+#starting the timer thread
+timer_thread.start()
 
 wn.mainloop()
