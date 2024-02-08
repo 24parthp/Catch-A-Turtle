@@ -3,12 +3,19 @@ import turtle as t
 from random import randint
 import time
 import threading
+import tkinter as Tk
 
-#screen
-wn = t.Screen()
+#------------------------------screen
+#main window
+mainWn = t.Screen()
 t.setup(1000,500)
 t.bgcolor('#151740')
 t.ht()
+
+#score and timer window
+score_and_timer_wn = tk.T
+
+#leaderboard window
 
 #variables and functions
 startTimer = False
@@ -42,8 +49,8 @@ class clickableTurtle:
         score = score + 1
 
         if startTimer == True:
-            xCor = round(randint((-wn.window_width()//2)+self.size*10, (wn.window_width()//2)-self.size*10))
-            yCor = round(randint((-wn.window_height()//2)+self.size*10, (wn.window_height()//2)-self.size*10))
+            xCor = round(randint((-mainWn.window_width()//2)+self.size*10, (mainWn.window_width()//2)-self.size*10))
+            yCor = round(randint((-mainWn.window_height()//2)+self.size*10, (mainWn.window_height()//2)-self.size*10))
 
             self.trtl.penup()
             self.trtl.goto(xCor, yCor)
@@ -66,7 +73,7 @@ class countdown_timer:
         print("Time's up!")
 
 #initialize turtle
-mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
+mainTurtle = clickableTurtle('circle', '#D936A0', 6, None)
 timer = countdown_timer(None,None,None,5)
 
 #setting up turtle
@@ -79,4 +86,4 @@ timer_thread = threading.Thread(target=timer.startTimer)
 #starting the timer thread
 timer_thread.start()
 
-wn.mainloop()
+mainWn.mainloop()
