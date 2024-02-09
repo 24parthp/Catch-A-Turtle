@@ -8,6 +8,7 @@ from tkinter import *
 #------------------------------screen
 #main window
 mainWn = t.Screen()
+mainWn.mode('world')
 t.setup(1000,500)
 t.bgcolor('#151740')
 t.ht()
@@ -18,24 +19,55 @@ def score_and_timer_wn():
 
     window = Toplevel()
 
+    window.geometry("200x200+550+470")
+
     score_and_time = Label(
         window,
         text=str(score),
-        fg="white",
-        bg="black",
-        width=10,
-        height=10
+        font=("Arial", 25),
+        fg="#060126",
+        bg="#1BF2B5",
+        width=20,
+        height=20
     )
 
     score_and_time.pack()
+
+    update_score_label(score_and_time)
 
     window.mainloop()
 
 #leaderboard window
 
+#updating score/timer window
+def update_score_label(label):
+    global score
+    label.config(text=str(score))
+    label.after(10, lambda: update_score_label(label))
+
+#retry screen
+def retryWn():
+    def execute_commands():
+        global score, startTimer, showRetryWn
+
+        startGame()
+        score = 0
+        startTimer = False
+        showRetryWn = False
+
+    retry = Toplevel()
+
+    label = Label(retry, text="Try Again?")
+    button1 = Button(retry, text="Yes", command=execute_commands())
+    button2 = Button(retry, text = "No", command=mainWn.bye())
+
+    button1.pack(), button2.pack()
+    label.pack()
+
 #variables and functions
 startTimer = False
 score = 0
+showRetryWn = False
 
 class clickableTurtle:
     def __init__(self, shape, color, size, speed):
@@ -74,33 +106,47 @@ class clickableTurtle:
             self.trtl.shapesize(self.size, self.size, 1)
 
 class countdown_timer:
-    def __init__(self, xPos, yPos, size, second):
-        self.xPos = xPos
-        self.yPos = yPos
-        self.size = size
+    def __init__(self, second):
         self.seconds = second
+        self.running = True
 
     def startTimer(self):
-        while self.seconds > 0:
+        while self.seconds > 0 and self.running:
             print(f"Time remaining: {self.seconds} seconds")
             time.sleep(1)
             self.seconds -= 1
 
         print("Time's up!")
+        #retryWn()
+    
+    def stop(self):
+        self.running = False
 
 #initialize turtle
-mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
-timer = countdown_timer(None,None,None,5)
+def startGame():
+    global mainTurtle, timer
 
-#setting up turtle
-mainTurtle.show()
-mainTurtle.trtl.onclick(mainTurtle.move)
+    mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
+    timer = countdown_timer(5)
 
-#creating thread for timer
-timer_thread = threading.Thread(target=timer.startTimer)
+    #setting up turtle
+    mainTurtle.show()
+    mainTurtle.trtl.onclick(mainTurtle.move)
 
-#starting the timer thread
-timer_thread.start()
+    #creating thread for timer
+    timer_thread = threading.Thread(target=timer.startTimer)
 
+    #starting the timer thread
+    timer_thread.start()
+
+def terminate():
+    global timer, mainWn
+    timer.stop()
+    mainWn.bye()
+
+mainWn.listen()
+mainWn.onkey(terminate, 'q')
+
+startGame()
 score_and_timer_wn()
 mainWn.mainloop()
