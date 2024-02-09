@@ -3,7 +3,7 @@ import turtle as t
 from random import randint
 import time
 import threading
-import tkinter as Tk
+from tkinter import *
 
 #------------------------------screen
 #main window
@@ -13,7 +13,23 @@ t.bgcolor('#151740')
 t.ht()
 
 #score and timer window
-score_and_timer_wn = tk.T
+def score_and_timer_wn():
+    global score
+
+    window = Toplevel()
+
+    score_and_time = Label(
+        window,
+        text=str(score),
+        fg="white",
+        bg="black",
+        width=10,
+        height=10
+    )
+
+    score_and_time.pack()
+
+    window.mainloop()
 
 #leaderboard window
 
@@ -73,7 +89,7 @@ class countdown_timer:
         print("Time's up!")
 
 #initialize turtle
-mainTurtle = clickableTurtle('circle', '#D936A0', 6, None)
+mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
 timer = countdown_timer(None,None,None,5)
 
 #setting up turtle
@@ -86,4 +102,5 @@ timer_thread = threading.Thread(target=timer.startTimer)
 #starting the timer thread
 timer_thread.start()
 
+score_and_timer_wn()
 mainWn.mainloop()
