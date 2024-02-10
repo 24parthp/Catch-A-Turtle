@@ -4,6 +4,7 @@ from random import randint
 import time
 import threading
 from tkinter import *
+import sys
 
 #------------------------------screen
 #main window
@@ -12,6 +13,28 @@ mainWn.mode('world')
 t.setup(1000,500)
 t.bgcolor('#151740')
 t.ht()
+
+#user's name window
+def ask_username():
+
+    def sendUserInfo():
+        global username 
+        input = inputtxt.get('1.0', 'end-1c')
+        username = str(input)
+        print(username)
+        username_wn.destroy()
+
+    username_wn = Toplevel()
+    username_wn.title('Username Input')
+    username_wn.geometry('200x100')
+
+    inputtxt = Text(username_wn, height = 1, width = 10)
+    inputtxt.pack()
+
+    button = Button(username_wn, text='Start', command=sendUserInfo)
+    button.pack()
+
+    username_wn.grab_set()
 
 #score and timer window
 def score_and_timer_wn():
@@ -36,7 +59,7 @@ def score_and_timer_wn():
     update_score_label(score_and_time)
 
     window.mainloop()
-
+    
 #leaderboard window
 
 #updating score/timer window
@@ -63,11 +86,6 @@ def retryWn():
 
     button1.pack(), button2.pack()
     label.pack()
-
-#variables and functions
-startTimer = False
-score = 0
-showRetryWn = False
 
 class clickableTurtle:
     def __init__(self, shape, color, size, speed):
@@ -124,7 +142,7 @@ class countdown_timer:
 
 #initialize turtle
 def startGame():
-    global mainTurtle, timer
+    global mainTurtle, timer, startTimer
 
     mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
     timer = countdown_timer(5)
@@ -133,20 +151,66 @@ def startGame():
     mainTurtle.show()
     mainTurtle.trtl.onclick(mainTurtle.move)
 
-    #creating thread for timer
-    timer_thread = threading.Thread(target=timer.startTimer)
+    #terminate window
+    terminate()
 
-    #starting the timer thread
-    timer_thread.start()
+    #asking for users name
+    ask_username()
 
+#start timer thread
+def startTimerThread():
+    global startTimer, timer, terminate_threads
+
+    while not startTimer and not terminate_threads:
+        time.sleep(0.1)
+    
+    if terminate_threads:
+        return
+
+        #starting the timer thread
+    if startTimer == True:
+        #creating thread for timer
+        timer_thread = threading.Thread(target=timer.startTimer)
+        timer_thread.start()
+
+#closes all the windows and also the timer theard
 def terminate():
-    global timer, mainWn
-    timer.stop()
-    mainWn.bye()
+    def closeEverything():
+        global timer, mainWn, terminate_threads
+        terminate_threads = True
+        timer.stop()
+        exit.destroy()
+        mainWn.bye()
+        sys.exit()
 
-mainWn.listen()
-mainWn.onkey(terminate, 'q')
+    exit = Toplevel()
+    exit.geometry('500x100')
+
+    Warningtxt = Text(exit, height=5, width=60)
+    Warningtxt.pack()
+
+    Warningtxt.insert(END, "To exit the program press the 'exit' button on the bottom. \n!!! DO NOT CLOSE THE PROGRAM BY PRESSING THE 'X' ON THE TOP RIGHT!!!")
+
+    button = Button(exit, text='Exit', command=closeEverything)
+    button.pack()
+
+#----------------------------variables
+startTimer = False
+score = 0
+showRetryWn = False
+username = 'test123'
+terminate_threads = False
+
+timer_check_thread = threading.Thread(target=startTimerThread)
+timer_check_thread.start()
 
 startGame()
 score_and_timer_wn()
 mainWn.mainloop()
+
+# to-do
+# make a new window which 'terminate's the program ----- Done
+# Make a window which asks for users name -------------- Done
+# ask for user's name ---------------------------------- Done
+# implement json 
+# make a new window for leaderboard
