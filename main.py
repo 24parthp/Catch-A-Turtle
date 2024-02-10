@@ -17,9 +17,8 @@ t.ht()
 
 #user's name window
 def ask_username():
-
     def sendUserInfo():
-        global username 
+        global username
         input = inputtxt.get('1.0', 'end-1c')
         username = str(input)
         print(username)
@@ -27,9 +26,13 @@ def ask_username():
 
     username_wn = Toplevel()
     username_wn.title('Username Input')
-    username_wn.geometry('200x100')
+    username_wn.geometry('400x100+1100+700')
 
-    inputtxt = Text(username_wn, height = 1, width = 10)
+    infotxt = Text(username_wn, height=1, width= 40)
+    infotxt.pack()
+    infotxt.insert(END, 'Enter Username below and then hit start')
+
+    inputtxt = Text(username_wn, height = 1, width = 20)
     inputtxt.pack()
 
     button = Button(username_wn, text='Start', command=sendUserInfo)
@@ -60,8 +63,36 @@ def score_and_timer_wn():
     update_score_label(score_and_time)
 
     window.mainloop()
-    
+
+#loading data into json file
+
+#test around with data
+def test_data(name, score):
+    print(f'Players name is : {name}')
+    print(f'players score is : {score}')
+
 #leaderboard window
+
+#saving data
+def save_score():
+    global username, score
+
+    json_file_path = "Catch-A-Turtle/data.json"
+
+    data = {"username": username, "score": score}
+
+    try:
+        with open(json_file_path, "r") as f:
+            scores = json.load(f)
+    except FileNotFoundError:
+        scores = []
+
+    scores.append(data)
+
+    json_string = json.dumps(scores, indent= 4)
+
+    with open(json_file_path, "w") as f:
+        f.write(json_string)
 
 #updating score/timer window
 def update_score_label(label):
@@ -72,21 +103,29 @@ def update_score_label(label):
 #retry screen
 def retryWn():
     def execute_commands():
-        global score, startTimer, showRetryWn
+        global score, startTimer, mainTurtle
 
+        save_score()
+        retry.destroy()
+        restartGame()
         startGame()
         score = 0
         startTimer = False
-        showRetryWn = False
+
+    def exit():
+        save_score()
+        closeEverything()
 
     retry = Toplevel()
+    retry.geometry('400x100+1100+700')
 
-    label = Label(retry, text="Try Again?")
-    button1 = Button(retry, text="Yes", command=execute_commands())
-    button2 = Button(retry, text = "No", command=mainWn.bye())
+    label = Text(retry, height=1, width=10)
+    label.insert(END, "Try again?")
 
-    button1.pack(), button2.pack()
-    label.pack()
+    button1 = Button(retry, text="Yes", command=execute_commands)
+    button2 = Button(retry, text = "No", command=exit)
+
+    label.pack(), button1.pack(), button2.pack()
 
 class clickableTurtle:
     def __init__(self, shape, color, size, speed):
@@ -94,6 +133,7 @@ class clickableTurtle:
         self.color = color
         self.size = size
         self.speed = speed
+        self.t = t
         self.trtl = t.Turtle()
         self.trtl.speed(0)
 
@@ -126,6 +166,8 @@ class clickableTurtle:
 
 class countdown_timer:
     def __init__(self, second):
+        global score, username
+
         self.seconds = second
         self.running = True
 
@@ -136,14 +178,15 @@ class countdown_timer:
             self.seconds -= 1
 
         print("Time's up!")
-        #retryWn()
+        test_data(username, score)
+        retryWn()
     
     def stop(self):
         self.running = False
 
 #initialize turtle
 def startGame():
-    global mainTurtle, timer, startTimer
+    global mainTurtle, timer, startTimer, terminateWn
 
     mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
     timer = countdown_timer(5)
@@ -153,7 +196,11 @@ def startGame():
     mainTurtle.trtl.onclick(mainTurtle.move)
 
     #terminate window
-    terminate()
+    if terminateWn == False:
+        terminate()
+        terminateWn = True
+    else:
+        return
 
     #asking for users name
     ask_username()
@@ -174,18 +221,19 @@ def startTimerThread():
         timer_thread = threading.Thread(target=timer.startTimer)
         timer_thread.start()
 
-#closes all the windows and also the timer theard
-def terminate():
-    def closeEverything():
+#closing everything
+def closeEverything():
         global timer, mainWn, terminate_threads
         terminate_threads = True
         timer.stop()
-        exit.destroy()
         mainWn.bye()
         sys.exit()
 
+#closes all the windows and also the timer theard
+def terminate():
+
     exit = Toplevel()
-    exit.geometry('500x100')
+    exit.geometry('500x100+1000+1025')
 
     Warningtxt = Text(exit, height=5, width=60)
     Warningtxt.pack()
@@ -195,12 +243,17 @@ def terminate():
     button = Button(exit, text='Exit', command=closeEverything)
     button.pack()
 
+#restarts the canvas for next game
+def restartGame():
+    global mainTurtle
+    mainTurtle.trtl.clear()
+
 #----------------------------variables
 startTimer = False
 score = 0
-showRetryWn = False
-username = 'test123'
+username = ''
 terminate_threads = False
+terminateWn = False
 
 timer_check_thread = threading.Thread(target=startTimerThread)
 timer_check_thread.start()
@@ -213,5 +266,8 @@ mainWn.mainloop()
 # make a new window which 'terminate's the program ----- Done
 # Make a window which asks for users name -------------- Done
 # ask for user's name ---------------------------------- Done
-# implement json 
+# configure all the data 
+    # player username
+    # score
+# implement json
 # make a new window for leaderboard
