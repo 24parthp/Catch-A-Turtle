@@ -41,14 +41,13 @@ def ask_username():
     username_wn.grab_set()
 
 #score and timer window
-def score_and_timer_wn():
+def scoreWn():
     global score
 
     window = Toplevel()
-
     window.geometry("200x200+550+470")
 
-    score_and_time = Label(
+    scoretxt = Label(
         window,
         text=str(score),
         font=("Arial", 25),
@@ -58,20 +57,39 @@ def score_and_timer_wn():
         height=20
     )
 
-    score_and_time.pack()
+    scoretxt.pack()
 
-    update_score_label(score_and_time)
+    update_score_label(scoretxt)
 
     window.mainloop()
 
-#loading data into json file
-
-#test around with data
-def test_data(name, score):
-    print(f'Players name is : {name}')
-    print(f'players score is : {score}')
-
 #leaderboard window
+
+#timer window
+def timerWn():
+    global timerSeconds
+
+    timewindow = Toplevel()
+    timewindow.geometry("200x200+550+750")
+
+    timetxt = Label(
+        timewindow,
+        text=timerSeconds,
+        font=("Arial", 25),
+        fg="#060126",
+        bg="#F21D92",
+        width=20,
+        height=20
+    )
+
+    timertxt = Text(timewindow, height= 1, width=10, font=("Arial", 25))
+    timertxt.insert(END, "Time")
+
+    timertxt.pack(),timetxt.pack()
+
+    update_time_label(timetxt)
+
+    timewindow.mainloop()
 
 #saving data
 def save_score():
@@ -99,6 +117,11 @@ def update_score_label(label):
     global score
     label.config(text=str(score))
     label.after(10, lambda: update_score_label(label))
+
+def update_time_label(label):
+    global timerSeconds
+    label.config(text=timerSeconds)
+    label.after(10, lambda: update_time_label(label))
 
 #retry screen
 def retryWn():
@@ -172,13 +195,15 @@ class countdown_timer:
         self.running = True
 
     def startTimer(self):
+        global timerSeconds
+
         while self.seconds > 0 and self.running:
-            print(f"Time remaining: {self.seconds} seconds")
+            print(f"Time remaining: {timerSeconds} seconds")
             time.sleep(1)
             self.seconds -= 1
+            timerSeconds = self.seconds
 
         print("Time's up!")
-        test_data(username, score)
         retryWn()
     
     def stop(self):
@@ -186,10 +211,10 @@ class countdown_timer:
 
 #initialize turtle
 def startGame():
-    global mainTurtle, timer, startTimer, terminateWn
+    global mainTurtle, timer, startTimer, terminateWn, timerSeconds
 
     mainTurtle = clickableTurtle('circle', '#D936A0', 1, None)
-    timer = countdown_timer(5)
+    timer = countdown_timer(timerSeconds)
 
     #setting up turtle
     mainTurtle.show()
@@ -205,9 +230,11 @@ def startGame():
     #asking for users name
     ask_username()
 
+    scoreWn()
+
 #start timer thread
 def startTimerThread():
-    global startTimer, timer, terminate_threads
+    global startTimer, timer, terminate_threads, timerSeconds
 
     while not startTimer and not terminate_threads:
         time.sleep(0.1)
@@ -220,6 +247,10 @@ def startTimerThread():
         #creating thread for timer
         timer_thread = threading.Thread(target=timer.startTimer)
         timer_thread.start()
+
+        while timerSeconds > 0 and not terminate_threads:
+            timerWn()
+            time.sleep(1)
 
 #closing everything
 def closeEverything():
@@ -249,6 +280,7 @@ def restartGame():
     mainTurtle.trtl.clear()
 
 #----------------------------variables
+timerSeconds = 10
 startTimer = False
 score = 0
 username = ''
@@ -259,7 +291,6 @@ timer_check_thread = threading.Thread(target=startTimerThread)
 timer_check_thread.start()
 
 startGame()
-score_and_timer_wn()
 mainWn.mainloop()
 
 # to-do
@@ -267,7 +298,7 @@ mainWn.mainloop()
 # Make a window which asks for users name -------------- Done
 # ask for user's name ---------------------------------- Done
 # configure all the data 
-    # player username
-    # score
-# implement json
+    # player username----------------------------------- Done
+    # score--------------------------------------------- Done
+# implement json --------------------------------------- Done
 # make a new window for leaderboard
