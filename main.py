@@ -23,10 +23,11 @@ def ask_username():
         username = str(input)
         print(username)
         username_wn.destroy()
+        leaderboardwn()
 
     username_wn = Toplevel()
     username_wn.title('Username Input')
-    username_wn.geometry('400x100+1100+700')
+    username_wn.geometry('400x100+765+540')
 
     infotxt = Text(username_wn, height=1, width= 40)
     infotxt.pack()
@@ -45,7 +46,7 @@ def scoreWn():
     global score
 
     window = Toplevel()
-    window.geometry("200x200+550+470")
+    window.geometry("200x200+250+290")
 
     scoretxt = Label(
         window,
@@ -64,13 +65,21 @@ def scoreWn():
     window.mainloop()
 
 #leaderboard window
+def leaderboardwn():
+    ldwindow = Toplevel()
+    ldwindow.geometry("200x500+1470+290")
+
+    txt = Text(ldwindow, height=max, width=max, font=("Arial", 10))
+    txt.insert(END, data)
+
+    ldwindow.mainloop()
 
 #timer window
 def timerWn():
     global timerSeconds
 
     timewindow = Toplevel()
-    timewindow.geometry("200x200+550+750")
+    timewindow.geometry("200x200+250+550")
 
     timetxt = Label(
         timewindow,
@@ -260,11 +269,11 @@ def closeEverything():
         mainWn.bye()
         sys.exit()
 
-#closes all the windows and also the timer theard
+#closes all the windows and also the timer thread
 def terminate():
 
     exit = Toplevel()
-    exit.geometry('500x100+1000+1025')
+    exit.geometry('500x100+700+150')
 
     Warningtxt = Text(exit, height=5, width=60)
     Warningtxt.pack()
