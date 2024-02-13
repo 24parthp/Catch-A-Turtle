@@ -68,9 +68,19 @@ def scoreWn():
 def leaderboardwn():
     ldwindow = Toplevel()
     ldwindow.geometry("200x500+1470+290")
+    txt = Text(ldwindow, height=1000, width=100, font=("Arial", 10))
 
-    txt = Text(ldwindow, height=max, width=max, font=("Arial", 10))
-    txt.insert(END, data)
+    with open('data.json', mode='r') as f:
+
+        data = json.load(f)
+        for i in data:
+            name = (i['username'])
+            score = (i['score'])
+            print(name, score)
+            showData = name + ' - ' + str(score) + '\n'
+            txt.insert(END, showData)
+
+    txt.pack()
 
     ldwindow.mainloop()
 
@@ -104,7 +114,7 @@ def timerWn():
 def save_score():
     global username, score
 
-    json_file_path = "Catch-A-Turtle/data.json"
+    json_file_path = "data.json"
 
     data = {"username": username, "score": score}
 
