@@ -21,7 +21,6 @@ def ask_username():
         global username
         input = inputtxt.get('1.0', 'end-1c')
         username = str(input)
-        print(username)
         username_wn.destroy()
         leaderboardwn()
 
@@ -43,7 +42,7 @@ def ask_username():
 
 #score and timer window
 def scoreWn():
-    global score
+    global score, window
 
     window = Toplevel()
     window.geometry("200x200+250+290")
@@ -66,6 +65,8 @@ def scoreWn():
 
 #leaderboard window
 def leaderboardwn():
+    global ldwindow
+
     ldwindow = Toplevel()
     ldwindow.geometry("200x500+1470+290")
     txt = Text(ldwindow, height=1000, width=100, font=("Arial", 10))
@@ -76,7 +77,6 @@ def leaderboardwn():
         for i in data:
             name = (i['username'])
             score = (i['score'])
-            print(name, score)
             showData = name + ' - ' + str(score) + '\n'
             txt.insert(END, showData)
 
@@ -84,9 +84,16 @@ def leaderboardwn():
 
     ldwindow.mainloop()
 
+def update_timer_label(label):
+    global timerSeconds
+    label.config(text=str(timerSeconds))
+
 #timer window
 def timerWn():
-    global timerSeconds
+    global timewindow
+
+    if timewindow is not None:
+        timewindow.destroy()
 
     timewindow = Toplevel()
     timewindow.geometry("200x200+250+550")
@@ -106,9 +113,7 @@ def timerWn():
 
     timertxt.pack(),timetxt.pack()
 
-    update_time_label(timetxt)
-
-    timewindow.mainloop()
+    return timertxt
 
 #saving data
 def save_score():
@@ -144,16 +149,6 @@ def update_time_label(label):
 
 #retry screen
 def retryWn():
-    def execute_commands():
-        global score, startTimer, mainTurtle
-
-        save_score()
-        retry.destroy()
-        restartGame()
-        startGame()
-        score = 0
-        startTimer = False
-
     def exit():
         save_score()
         closeEverything()
@@ -164,10 +159,9 @@ def retryWn():
     label = Text(retry, height=1, width=10)
     label.insert(END, "Try again?")
 
-    button1 = Button(retry, text="Yes", command=execute_commands)
     button2 = Button(retry, text = "No", command=exit)
 
-    label.pack(), button1.pack(), button2.pack()
+    label.pack(), button2.pack()
 
 class clickableTurtle:
     def __init__(self, shape, color, size, speed):
@@ -253,7 +247,7 @@ def startGame():
 
 #start timer thread
 def startTimerThread():
-    global startTimer, timer, terminate_threads, timerSeconds
+    global startTimer, timer, terminate_threads, timerSeconds, mainWn
 
     while not startTimer and not terminate_threads:
         time.sleep(0.1)
@@ -268,7 +262,7 @@ def startTimerThread():
         timer_thread.start()
 
         while timerSeconds > 0 and not terminate_threads:
-            timerWn()
+            mainWn.ontimer(timerWn, 100)
             time.sleep(1)
 
 #closing everything
@@ -295,11 +289,12 @@ def terminate():
 
 #restarts the canvas for next game
 def restartGame():
-    global mainTurtle
-    mainTurtle.trtl.clear()
+    mainWn.clear()
+    startGame()
 
 #----------------------------variables
 timerSeconds = 10
+timewindow = None
 startTimer = False
 score = 0
 username = ''
